@@ -1,0 +1,10 @@
+[build]
+  # pasta que o Netlify vai publicar (onde está seu index.html)
+  publish = "."
+
+  # como é site estático, não precisa build
+  command = ""
+
+[functions]
+  # caminho até as funções (onde está o ai-assistant.js da pasta netlify)
+  directory = "backend/netlify/functions"

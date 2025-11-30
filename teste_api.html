@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Teste Automático</title>
+</head>
+<body style="background:#000; color:#fff; font-family:sans-serif; text-align:center; padding:50px;">
+
+    <h1>TESTE AUTOMÁTICO DEEPSEEK</h1>
+    <h3 id="status" style="color:yellow;">Iniciando teste em 3 segundos...</h3>
+    <div id="log" style="text-align:left; background:#222; padding:20px; margin-top:20px; white-space:pre-wrap;">Logs aparecerão aqui...</div>
+
+    <script>
+        // ⚠️ SUA CHAVE QUE ESTAVA NO PRINT (Pode apagar depois)
+        const MY_KEY = 'sk-d988d72086714703b86a3e160224e29c'; 
+
+        function log(msg) {
+            document.getElementById('log').textContent += "\n" + msg;
+            console.log(msg);
+        }
+
+        async function runTest() {
+            const status = document.getElementById('status');
+            status.textContent = "⏳ Enviando requisição para DeepSeek...";
+            log("1. Preparando envio...");
+            log("2. Chave usada: " + MY_KEY.substring(0, 10) + "...");
+
+            try {
+                const response = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${MY_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "deepseek-chat",
+                        messages: [
+                            { role: "user", content: "Responda apenas: OK" }
+                        ],
+                        max_tokens: 5
+                    })
+                });
+
+                log("3. Resposta recebida. Status: " + response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const resposta = data.choices[0].message.content;
+                    status.innerHTML = "✅ SUCESSO! A API RESPONDEU.";
+                    status.style.color = "#0f0";
+                    log("4. Conteúdo da IA: " + resposta);
+                    alert("SUCESSO! A chave funciona. Pode configurar o App.");
+                } else {
+                    const err = await response.json();
+                    status.innerHTML = "❌ ERRO: " + response.status;
+                    status.style.color = "red";
+                    log("4. Detalhe do erro: " + JSON.stringify(err, null, 2));
+                    
+                    if(response.status === 402) alert("ERRO: Saldo insuficiente na DeepSeek.");
+                    else alert("ERRO NA API: " + response.status);
+                }
+
+            } catch (e) {
+                status.textContent = "❌ ERRO DE CONEXÃO";
+                status.style.color = "red";
+                log("ERRO CRÍTICO: " + e.message);
+                alert("O navegador bloqueou a conexão ou você está sem internet.");
+            }
+        }
+
+        // Roda automaticamente após 2 segundos
+        setTimeout(runTest, 2000);
+    </script>
+</body>
+</html>
